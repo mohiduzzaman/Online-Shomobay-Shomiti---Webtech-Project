@@ -1,0 +1,65 @@
+
+if($result->num_rows >0){
+				while($row = $result->fetch_assoc()){
+					$friendRequst =  $row["friend_request"];
+					$friendList   = $row["friend_list"];
+				}
+				$parts_friendRequest = explode('/', $friendRequst);
+				$parts_friendList = explode('/', $friendList);
+				print_r($parts_friendList);
+				echo "<br/>";
+				print_r($parts_friendRequest);
+				echo "<br/>";
+				echo "i am here";
+				$query2 = "select * form user_registration_table where userEmail = '$searcher_email'";
+				$result2 = $con->query($query2);
+				if($result2->num_rows>0){
+					while($row = $result2->fetch_assoc()){
+						$searcher_id = $row["primaryId"];
+					}
+				}
+				echo "searcher id".$searcher_id;
+
+$isFriend = false;$isRequested = false;
+				for($i = 0;$i<count($parts_friendList);$i++){
+					if((int)$parts_friendList == (int)$searcher_id){
+						$isFriend = true;
+						break;
+					}
+				}
+				if($isFriend){
+					echo "Friends to EachOther";
+				}
+				else if(!$isFriend){
+					// checking in friend request list
+					
+					for($i = 0;$i<count($parts_friendRequest);$i++){
+						if((int)$parts_friendRequest == (int)$searcher_id){
+							$isRequested = true;
+							break;
+						}
+					}
+					if($isRequested == true){
+						echo "your friend request is hanging on!";
+					}
+					if(!$isFriend && !$isRequested){
+						echo "<input type ='submit' value='Send Him A friend Request' name = 'request_btn'/>";
+					}
+					if(!$isRequested){
+						// checking is already inserted userid or not
+						$query3 = "select user_id from friends_table where user_id = '$searcher_id'";
+						$result3 = $con->query($query3);
+						if($result3->num_rows>0){
+							$query4 = "update friends_table set friend_request = CONCAT(friend_request,'/$searcher_id') where user_id = '$userid'";
+							$result4 = mysqli_query($con,$query4);
+							if($result4)echo "<script>alert('feriend request sent')</script>";
+						}
+						else{
+							$query5 = "insert into friends_table(user_id,friend_requst)values('$userid','/$searcher_id')";
+							$result5 = mysqli_query($con,$query5);
+
+						}
+					}
+				}
+			}
+	 	}
